@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PhoneBook;
 
@@ -11,9 +12,11 @@ using PhoneBook;
 namespace PhoneBook.Migrations
 {
     [DbContext(typeof(ContactsContext))]
-    partial class ContactsContextModelSnapshot : ModelSnapshot
+    [Migration("20251001141859_EmailUnique")]
+    partial class EmailUnique
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

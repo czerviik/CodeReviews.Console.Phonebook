@@ -1,4 +1,7 @@
+using System.ComponentModel.DataAnnotations;
 using System.Reflection;
+using Azure;
+using Microsoft.VisualBasic;
 using Spectre.Console;
 
 namespace PhoneBook;
@@ -6,17 +9,114 @@ namespace PhoneBook;
 public static class UserInterface
 {
     internal static MenuOptions OptionChoice { get; private set; }
+    const int MAX_ROWS = 4;
+    internal static int page = 1;
     public static void MainMenu()
     {
         Header("phone book");
 
         MenuOptions[] options = {
                 MenuOptions.ShowAllContacts,
+                MenuOptions.AddContact,
                 MenuOptions.Exit};
 
         ChooseOptions(options);
     }
+    public static void AllContactsMenu(List<Contact> contacts, PageModifier pageMod = PageModifier.None)
+    {
+        if (pageMod == PageModifier.Increase) page += 1;
+        else if(pageMod == PageModifier.Decrease) page -= 1;
 
+        Header("contacts");
+        DisplayContactTable(contacts,page);
+        var options = new List<MenuOptions> {
+                MenuOptions.AddContact,
+                MenuOptions.EditContact,
+                MenuOptions.DeleteContact,
+                MenuOptions.Back};
+        
+        if (contacts.Count > MAX_ROWS && page > 1) 
+            options.Insert(0,MenuOptions.PreviousPage);
+        if (contacts.Count > MAX_ROWS && page < (double)contacts.Count/MAX_ROWS) 
+            options.Insert(0,MenuOptions.NextPage);
+
+        ChooseOptions(options.ToArray());
+
+        
+    }
+    public static void ContactEditMenu(List<Contact> contact)
+    {
+        page = 1;
+        Header("edit contact");
+        DisplayContactTable(contact, page);
+
+        var options = new List<MenuOptions> {
+                MenuOptions.EditName,
+                MenuOptions.EditEmail,
+                MenuOptions.EditPhone,
+                MenuOptions.AddPhone,
+                MenuOptions.DefaultPhone,
+                MenuOptions.DeletePhone,
+                MenuOptions.Back
+        };
+
+        ChooseOptions(options.ToArray());
+
+    }
+    public static void AllContactNumbers(List<PhoneNumber> phoneNumbers)
+    {
+        List<string> numbersList = new ();
+        foreach (PhoneNumber number in phoneNumbers)
+        {
+            numbersList.Add(number.Number);
+        }
+        numbersList.Add("Back"); //dokoncit logiku vybirani cisel
+
+        var numberChoice = AnsiConsole.Prompt(
+            new SelectionPrompt<string>()
+            .HighlightStyle("yellow")
+            .AddChoices(numbersList)
+            );
+    }
+    internal static void DisplayContactTable(List<Contact> contacts, int page)
+    {
+        var table = new Table()
+        .Border(TableBorder.Rounded);
+
+        FormatTableData(contacts, table, page);
+        AnsiConsole.Write(table);
+    }
+
+    internal static void FormatTableData(List<Contact> contacts, Table table, int page)
+        {
+            table        
+            .AddColumns("Id", "Name","E-mail","Phone number","Date created","Date modified")
+            .Border(TableBorder.Rounded);
+            int startingRow = (page * MAX_ROWS)-MAX_ROWS;
+
+
+            for (int i = startingRow; i < startingRow + MAX_ROWS && i < contacts.Count; i++)
+            {
+
+                table.AddRow(contacts[i].Id.ToString(),
+                            contacts[i].Name,
+                            contacts[i].Email,
+                            contacts[i].PhoneNumbers.FirstOrDefault(p => p.Default)?.Number,
+                            contacts[i].DateAdded.ToString("yyyy-MM-dd, HH:mm:ss"),
+                            contacts[i].DateModified.ToString("yyyy-MM-dd, HH:mm:ss")
+                            );
+            }
+        }
+    public static void DefaultNumber(string phoneNum)
+    {
+
+        Console.WriteLine($"Is {phoneNum} the default number?");
+        MenuOptions[] options = {
+                MenuOptions.Yes,
+                MenuOptions.No};
+
+        ChooseOptions(options);
+    }
 
     private static void Header(string headerText)
     {
@@ -34,70 +134,6 @@ public static class UserInterface
             );
     }
 
-    // private static void DisplayTable(DrinkDetail drinkDetail)
-    // {
-
-
-    //     TableHeader(drinkDetail);
-
-    //     var table = new Table()
-    //     .AddColumns("details:", "")
-    //     .Border(TableBorder.Rounded);
-
-    //     FormatTableData(table, drinkDetail);
-
-    //     table.Columns[0].RightAligned();
-    //     AnsiConsole.Write(table);
-    // }
-
-    // private static void FormatTableData(Table table, DrinkDetail drinkDetail)
-    // {
-    //     var ingredientNumber = 0;
-    //     var drinkType = drinkDetail.GetType();
-    //     PropertyInfo[] properties = drinkType.GetProperties();
-
-    //     foreach (var property in properties)
-    //     {
-    //         var modifiedPropertyName = Operations.ModifyPropertyName(property).ToString();
-
-    //         if (property.GetValue(drinkDetail) != null &&
-    //         property.GetValue(drinkDetail) != "" &&
-    //         modifiedPropertyName != "Name" &&
-    //         modifiedPropertyName != "IsFavorite" &&
-    //         modifiedPropertyName != "Id" &&
-    //         !modifiedPropertyName.StartsWith("Measure"))
-    //         {
-    //             if (modifiedPropertyName.StartsWith("Ingredient"))
-    //             {
-    //                 ingredientNumber++;
-
-    //                 var measureProperty = properties.FirstOrDefault(p => p.Name == ("strMeasure" + ingredientNumber.ToString()));
-    //                 var measurePropertyValue = measureProperty.GetValue(drinkDetail) ?? "";
-
-    //                 if (measurePropertyValue != "")
-    //                 {
-    //                     table.AddRow(modifiedPropertyName, $"{measurePropertyValue} of {property.GetValue(drinkDetail)}");
-    //                     continue;
-    //                 }
-    //             }
-    //             table.AddRow(modifiedPropertyName, property.GetValue(drinkDetail).ToString());
-    //         }
-    //     }
-    // }
-
-    // private static void TableHeader(DrinkDetail drinkDetail)
-    // {
-    //     if (drinkDetail.IsFavorite)
-    //     {
-    //         Console.Write($"DRINK: {drinkDetail.Name} ");
-    //         Console.BackgroundColor = ConsoleColor.Blue;
-    //         Console.ForegroundColor = ConsoleColor.White;
-    //         Console.WriteLine("*FAVORITE*");
-    //         Console.ResetColor();
-    //     }
-    //     else
-    //         Console.WriteLine($"DRINK: {drinkDetail.Name}");
-    // }
 
     public static void DisplayMessage(string message = "", string actionMessage = "continue", bool consoleClear = false)
     {
