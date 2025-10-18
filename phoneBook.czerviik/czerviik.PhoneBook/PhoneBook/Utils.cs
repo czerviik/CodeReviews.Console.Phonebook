@@ -28,30 +28,59 @@ public static class Utils
         return phonenum.StartsWith('+') && long.TryParse(phonenum.AsSpan(1), out long _);
     }
 
-    internal static string GetUserEmail(ContactsContext context)
+    internal static string GetUserEmail(ContactsContext context, string email = "")
     {
-        string email;
+        var isEdit = email != "";
         while (true)
         {
-            email = AnsiConsole.Ask<string>("Contact's email").Trim();
-            if (Utils.ValidateEmail(email) && !context.Contacts.AsNoTracking().Any(c => c.Email == email))
+            email = AnsiConsole.Prompt(
+                new TextPrompt<string>("Contact's email: ")
+                    .DefaultValue(email)
+                    .PromptStyle("yellow")
+            ).Trim();
+
+            if (!ValidateEmail(email))
+                Console.WriteLine("Invalid email.");
+            else if (!context.Contacts.AsNoTracking().Any(c => c.Email == email))
+            {
+                UserInterface.DisplayMessage("Contact's e-mail was modified.");
                 break;
+            }
+
+            else if (isEdit)
+                {
+                    UserInterface.DisplayMessage("Contact's e-mail was not modified.");
+                    break;
+                }
             else
-                Console.WriteLine("Invalid or already used email.");
+                Console.WriteLine("Email already used.");
         }
         return email;
     }
-    internal static string GetUserName() => AnsiConsole.Ask<string>("Contact's name: ").Trim();
-    internal static string GetUserPhone()
+    internal static string GetUserName(string contactName = "")
     {
-        string phoneNum;
+        return AnsiConsole.Prompt(
+                new TextPrompt<string>("Contact's name: ")
+                    .DefaultValue(contactName)
+                    .PromptStyle("yellow")
+            ).Trim();
+    }
+    internal static string GetUserPhone(string phoneNum = "")
+    {
+        var isEdit = phoneNum != "";
+
         while (true)
         {
-            phoneNum = AnsiConsole.Ask<string>("Contact's telephone number (with prefix)").Replace(" ", "");
-            if (ValidatePhone(phoneNum))
-                break;
-            else
+            phoneNum = AnsiConsole.Prompt(
+                new TextPrompt<string>("Contact's telephone number (with prefix): ")
+                    .DefaultValue(phoneNum)
+                    .PromptStyle("yellow")
+            ).Replace(" ", "");
+            if (!ValidatePhone(phoneNum))
                 Console.WriteLine("Invalid phone number.");
+            else
+                break;
+                
         }
         return phoneNum;
     }

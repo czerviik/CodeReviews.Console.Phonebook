@@ -35,7 +35,6 @@ public enum MenuOptions
     EditEmail,
     AddPhone,
     DeletePhone,
-    DefaultPhone,
     EditPhone,
     EditCategory,
     Exit

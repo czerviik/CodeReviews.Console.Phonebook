@@ -3,12 +3,14 @@ using System.Reflection;
 using Azure;
 using Microsoft.VisualBasic;
 using Spectre.Console;
+using System.Text.RegularExpressions;
 
 namespace PhoneBook;
 
-public static class UserInterface
+public static partial class UserInterface
 {
     internal static MenuOptions OptionChoice { get; private set; }
+    internal static string? NumberChoice { get; private set; }
     const int MAX_ROWS = 4;
     internal static int page = 1;
     public static void MainMenu()
@@ -32,7 +34,6 @@ public static class UserInterface
         var options = new List<MenuOptions> {
                 MenuOptions.AddContact,
                 MenuOptions.EditContact,
-                MenuOptions.DeleteContact,
                 MenuOptions.Back};
         
         if (contacts.Count > MAX_ROWS && page > 1) 
@@ -44,7 +45,7 @@ public static class UserInterface
 
         
     }
-    public static void ContactEditMenu(List<Contact> contact)
+    public static void ContactEditMenu(Contact contact)
     {
         page = 1;
         Header("edit contact");
@@ -55,8 +56,8 @@ public static class UserInterface
                 MenuOptions.EditEmail,
                 MenuOptions.EditPhone,
                 MenuOptions.AddPhone,
-                MenuOptions.DefaultPhone,
                 MenuOptions.DeletePhone,
+                MenuOptions.DeleteContact,
                 MenuOptions.Back
         };
 
@@ -65,18 +66,22 @@ public static class UserInterface
     }
     public static void AllContactNumbers(List<PhoneNumber> phoneNumbers)
     {
-        List<string> numbersList = new ();
-        foreach (PhoneNumber number in phoneNumbers)
-        {
-            numbersList.Add(number.Number);
-        }
-        numbersList.Add("Back"); //dokoncit logiku vybirani cisel
+        AnsiConsole.MarkupLine("EDIT PHONE NUMBER: ");
 
-        var numberChoice = AnsiConsole.Prompt(
+        List<string> numbersList = [];
+        foreach (PhoneNumber phoneNumber in phoneNumbers)
+        {
+            var color = phoneNumber.Default ? "blue" : "white";
+            numbersList.Add($"[{color}]{phoneNumber.Number}[/]");
+        }
+        numbersList.Add("[grey]Back[/]");
+
+        NumberChoice = AnsiConsole.Prompt(
             new SelectionPrompt<string>()
             .HighlightStyle("yellow")
             .AddChoices(numbersList)
             );
+        NumberChoice = MyRegex().Replace(NumberChoice, "");
     }
     internal static void DisplayContactTable(List<Contact> contacts, int page)
     {
@@ -86,36 +91,75 @@ public static class UserInterface
         FormatTableData(contacts, table, page);
         AnsiConsole.Write(table);
     }
+    internal static void DisplayContactTable(Contact contact, int page)
+    {
+        var table = new Table()
+        .Border(TableBorder.Rounded);
+
+        FormatTableData(contact, table, page);
+        AnsiConsole.Write(table);
+    }
 
     internal static void FormatTableData(List<Contact> contacts, Table table, int page)
-        {
-            table        
-            .AddColumns("Id", "Name","E-mail","Phone number","Date created","Date modified")
-            .Border(TableBorder.Rounded);
-            int startingRow = (page * MAX_ROWS)-MAX_ROWS;
-
-
-            for (int i = startingRow; i < startingRow + MAX_ROWS && i < contacts.Count; i++)
-            {
-
-                table.AddRow(contacts[i].Id.ToString(),
-                            contacts[i].Name,
-                            contacts[i].Email,
-                            contacts[i].PhoneNumbers.FirstOrDefault(p => p.Default)?.Number,
-                            contacts[i].DateAdded.ToString("yyyy-MM-dd, HH:mm:ss"),
-                            contacts[i].DateModified.ToString("yyyy-MM-dd, HH:mm:ss")
-                            );
-            }
-        }
-    public static void DefaultNumber(string phoneNum)
     {
+        table
+        .AddColumns("Id", "Name", "E-mail", "Phone number", "Date created", "Date modified")
+        .Border(TableBorder.Rounded);
+        int startingRow = (page * MAX_ROWS) - MAX_ROWS;
 
-        Console.WriteLine($"Is {phoneNum} the default number?");
+
+        for (int i = startingRow; i < startingRow + MAX_ROWS && i < contacts.Count; i++)
+        {
+
+            table.AddRow(contacts[i].Id.ToString(),
+                        contacts[i].Name,
+                        contacts[i].Email,
+                        contacts[i].PhoneNumbers
+                        .OrderByDescending(p => p.Default)
+                        .ThenByDescending(p => p.DateAdded)
+                        .FirstOrDefault()?.Number,
+                        contacts[i].DateAdded.ToString("yyyy-MM-dd, HH:mm:ss"),
+                        contacts[i].DateModified.ToString("yyyy-MM-dd, HH:mm:ss")
+                        );
+        }
+    }
+    internal static void FormatTableData(Contact contact, Table table, int page)
+    {
+        table
+        .AddColumns("Id", "Name", "E-mail", "Phone number", "Date created", "Date modified")
+        .Border(TableBorder.Rounded);
+        int startingRow = (page * MAX_ROWS) - MAX_ROWS;
+
+        table.AddRow(contact.Id.ToString(),
+                    contact.Name,
+                    contact.Email,
+                    contact.PhoneNumbers
+                    .OrderByDescending(p => p.Default)
+                    .ThenByDescending(p => p.DateAdded)
+                    .FirstOrDefault()?.Number,
+                    contact.DateAdded.ToString("yyyy-MM-dd, HH:mm:ss"),
+                    contact.DateModified.ToString("yyyy-MM-dd, HH:mm:ss")
+                    );
+    }
+    public static bool ConfirmDefaultNumber()
+    {
+        Console.WriteLine("Mark this as the default number?");
         MenuOptions[] options = {
                 MenuOptions.Yes,
                 MenuOptions.No};
 
         ChooseOptions(options);
+        return OptionChoice == MenuOptions.Yes;
+    }
+    public static bool ConfirmDelete()
+    {
+        Console.WriteLine("Do you really want to delete?");
+        MenuOptions[] options = {
+                MenuOptions.Yes,
+                MenuOptions.No};
+
+        ChooseOptions(options);
+        return OptionChoice == MenuOptions.Yes;
     }
 
     private static void Header(string headerText)
@@ -146,4 +190,7 @@ public static class UserInterface
 
         Console.ReadKey();
     }
+
+    [GeneratedRegex(@"\[[^\]]+\]")]
+    private static partial Regex MyRegex();
 }

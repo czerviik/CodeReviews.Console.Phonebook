@@ -47,12 +47,13 @@ public class MainMenu : Menu
 
 public class AllContactsMenu : Menu
 {
-    private readonly List<Contact> _contacts = ContactsController.GetContacts();
+    private List<Contact> contacts;
     private PageModifier pageMod = PageModifier.None;
     public AllContactsMenu(MenuManager menuManager) : base(menuManager) { }
     public override void Display()
     {
-        UserInterface.AllContactsMenu(_contacts, pageMod);
+        contacts = ContactsController.GetContacts();
+        UserInterface.AllContactsMenu(contacts, pageMod);
         HandleUserOptions();
     }
 
@@ -75,9 +76,10 @@ public class AllContactsMenu : Menu
                 break;
             case MenuOptions.EditContact:
                 MenuManager.NewMenu(new EditContactMenu(MenuManager));
+                MenuManager.DisplayCurrentMenu();
                 break;
             case MenuOptions.DeleteContact:
-                //MenuManager.NewMenu(new DeleteContactMenu(MenuManager));
+                //MenuManager.NewMenu(new DeleteContactMenu(Menu    Manager)); //pokracovat zde
                 break;
             case MenuOptions.Back:
                 MenuManager.GoBack();
@@ -102,7 +104,7 @@ public class AddContactMenu : Menu
 public class EditContactMenu : Menu
 {
     internal int Id { get; set; }
-    internal List<Contact> Contacts { get; set; }
+    internal Contact Contact { get; set; }
     public EditContactMenu(MenuManager menuManager) : base(menuManager)
     {
         while (true)
@@ -112,11 +114,10 @@ public class EditContactMenu : Menu
             else UserInterface.DisplayMessage("Wrong ID.");
         }
     }
-
     public override void Display()
     {
-        Contacts = ContactsController.GetContactById(Id);
-        UserInterface.ContactEditMenu(Contacts);
+        Contact = ContactsController.GetContactById(Id);
+        UserInterface.ContactEditMenu(Contact);
         HandleUserOptions();
     }
     private void HandleUserOptions()
@@ -124,19 +125,48 @@ public class EditContactMenu : Menu
         switch (UserInterface.OptionChoice)
         {
             case MenuOptions.EditName:
-                ContactsController.EditName(Id);
+                ContactsController.EditName(Contact);
                 MenuManager.DisplayCurrentMenu();
                 break;
             case MenuOptions.EditEmail:
-                ContactsController.EditEmail(Id);
+                ContactsController.EditEmail(Contact);
                 MenuManager.DisplayCurrentMenu();
                 break;
             case MenuOptions.EditPhone:
-                
-                UserInterface.AllContactNumbers(ContactsController.GetContactNumbers(Contacts.FirstOrDefault(c => c.Id == Id)));
-                //ContactsController.EditPhone(Id,);
+                var contactsNumbers = ContactsController.GetContactNumbers(Contact);
+                UserInterface.AllContactNumbers(contactsNumbers);
+
+                var userNumber = contactsNumbers.FirstOrDefault(p => p.Number == UserInterface.NumberChoice);
+                if (userNumber != null)
+                    ContactsController.EditPhone(Contact,userNumber);
                 MenuManager.DisplayCurrentMenu();
-                break;                
+                break;     
+            case MenuOptions.AddPhone:
+                ContactsController.AddPhone(Contact);
+                MenuManager.DisplayCurrentMenu();
+                break;
+            case MenuOptions.DeletePhone:
+                contactsNumbers = ContactsController.GetContactNumbers(Contact);
+                UserInterface.AllContactNumbers(contactsNumbers);
+                userNumber = contactsNumbers.FirstOrDefault(p => p.Number == UserInterface.NumberChoice);
+                if (userNumber != null)
+                {
+                    if (UserInterface.ConfirmDelete())
+                    ContactsController.DeletePhone(userNumber);
+                }
+                MenuManager.DisplayCurrentMenu();
+                break;
+            case MenuOptions.DeleteContact:
+                if (Contact != null)
+                {
+                    if (UserInterface.ConfirmDelete())
+                    ContactsController.DeleteContact(Contact);
+                }
+                MenuManager.GoBack();
+                break;
+            case MenuOptions.Back:
+                MenuManager.GoBack();
+                break;   
             case MenuOptions.Exit:
                 MenuManager.Close();
                 break;
