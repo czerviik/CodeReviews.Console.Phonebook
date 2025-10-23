@@ -1,0 +1,4 @@
+# Sensitive files
+credentials.json
+PhoneBook/credentials.json
+token.json
