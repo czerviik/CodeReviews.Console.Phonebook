@@ -1,5 +1,4 @@
-using Azure;
-using Microsoft.VisualBasic;
+using System.Threading.Tasks;
 using Spectre.Console;
 
 namespace PhoneBook;
@@ -68,7 +67,10 @@ public class AllContactsMenu : Menu
             case MenuOptions.PreviousPage:
                 pageMod = PageModifier.Decrease;
                 MenuManager.DisplayCurrentMenu();
-               break;
+                break;
+            case MenuOptions.SendEmail:
+                MenuManager.NewMenu(new SendEmail(MenuManager));
+                break;
             case MenuOptions.AddContact:
                 ContactsController.AddContact();
                 UserInterface.DisplayMessage("Contact added.");
@@ -77,9 +79,6 @@ public class AllContactsMenu : Menu
             case MenuOptions.EditContact:
                 MenuManager.NewMenu(new EditContactMenu(MenuManager));
                 MenuManager.DisplayCurrentMenu();
-                break;
-            case MenuOptions.DeleteContact:
-                //MenuManager.NewMenu(new DeleteContactMenu(Menu    Manager)); //pokracovat zde
                 break;
             case MenuOptions.Back:
                 MenuManager.GoBack();
@@ -103,7 +102,7 @@ public class AddContactMenu : Menu
 }
 public class EditContactMenu : Menu
 {
-    internal int Id { get; set; }
+    internal int Id { get; }
     internal Contact Contact { get; set; }
     public EditContactMenu(MenuManager menuManager) : base(menuManager)
     {
@@ -138,9 +137,9 @@ public class EditContactMenu : Menu
 
                 var userNumber = contactsNumbers.FirstOrDefault(p => p.Number == UserInterface.NumberChoice);
                 if (userNumber != null)
-                    ContactsController.EditPhone(Contact,userNumber);
+                    ContactsController.EditPhone(Contact, userNumber);
                 MenuManager.DisplayCurrentMenu();
-                break;     
+                break;
             case MenuOptions.AddPhone:
                 ContactsController.AddPhone(Contact);
                 MenuManager.DisplayCurrentMenu();
@@ -152,7 +151,7 @@ public class EditContactMenu : Menu
                 if (userNumber != null)
                 {
                     if (UserInterface.ConfirmDelete())
-                    ContactsController.DeletePhone(userNumber);
+                        ContactsController.DeletePhone(userNumber);
                 }
                 MenuManager.DisplayCurrentMenu();
                 break;
@@ -160,13 +159,13 @@ public class EditContactMenu : Menu
                 if (Contact != null)
                 {
                     if (UserInterface.ConfirmDelete())
-                    ContactsController.DeleteContact(Contact);
+                        ContactsController.DeleteContact(Contact);
                 }
                 MenuManager.GoBack();
                 break;
             case MenuOptions.Back:
                 MenuManager.GoBack();
-                break;   
+                break;
             case MenuOptions.Exit:
                 MenuManager.Close();
                 break;
@@ -174,5 +173,24 @@ public class EditContactMenu : Menu
                 MenuManager.Close();
                 break;
         }
+    }
+}
+public class SendEmail : Menu
+{
+    internal int Id { get; }
+
+    public SendEmail(MenuManager menuManager) : base(menuManager)
+    {
+        while (true)
+        {
+            Id = AnsiConsole.Ask<int>("Enter the contact's ID: ");
+            if (ContactsController.IdExists(Id) == true) break;
+            else UserInterface.DisplayMessage("Wrong ID.");
+        }
+    }
+
+    public override void Display()
+    {
+        UserInterface.SendEmailMenu(ContactsController.GetContactById(Id));
     }
 }

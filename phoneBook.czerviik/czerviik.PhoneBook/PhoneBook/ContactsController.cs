@@ -7,15 +7,22 @@ public class ContactsController
 {
     internal static void AddContact()
     {
-        using var context = new ContactsContext();
-        var contact = new Contact
-        {
-            Name = Utils.GetUserName(),
-            Email = Utils.GetUserEmail(context),
-        };
-        contact.PhoneNumbers.Add(new PhoneNumber {Number = Utils.GetUserPhone()});
-        context.Add(contact);
-        context.SaveChanges();
+      try
+      {
+          using var context = new ContactsContext();
+          var contact = new Contact
+          {
+              Name = Utils.GetUserName(),
+              Email = Utils.GetUserEmail(context),
+          };
+          contact.PhoneNumbers.Add(new PhoneNumber {Number = Utils.GetUserPhone()});
+          context.Add(contact);
+          context.SaveChanges();
+      }
+      catch (Exception ex) //podchytit connection exception
+      {
+            UserInterface.DisplayMessage($"Connection lost. Er:{ex.Message}","return to main menu",true);
+      }
     }
     internal static void AddPhone(Contact contact)
     {

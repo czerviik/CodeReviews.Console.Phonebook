@@ -47,9 +47,8 @@ public static partial class UserInterface
     }
     public static void ContactEditMenu(Contact contact)
     {
-        page = 1;
         Header("edit contact");
-        DisplayContactTable(contact, page);
+        DisplayContactTable(contact);
 
         var options = new List<MenuOptions> {
                 MenuOptions.EditName,
@@ -64,6 +63,12 @@ public static partial class UserInterface
         ChooseOptions(options.ToArray());
 
     }
+    public static void SendEmailMenu(Contact contact)
+    {
+        Header("send email");
+        DisplayContactTable(contact);
+    }
+    
     public static void AllContactNumbers(List<PhoneNumber> phoneNumbers)
     {
         AnsiConsole.MarkupLine("EDIT PHONE NUMBER: ");
@@ -91,7 +96,7 @@ public static partial class UserInterface
         FormatTableData(contacts, table, page);
         AnsiConsole.Write(table);
     }
-    internal static void DisplayContactTable(Contact contact, int page)
+    internal static void DisplayContactTable(Contact contact, int page = 1)
     {
         var table = new Table()
         .Border(TableBorder.Rounded);

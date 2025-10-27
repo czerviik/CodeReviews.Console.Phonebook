@@ -18,16 +18,16 @@ public static class GoogleAuthService
             CancellationToken.None,
             new FileDataStore(credPath, true));
     }
-        //     public static GetUserEmail()
-    // {
-    //     var gmail = new GmailService(new BaseClientService.Initializer
-    //     {
-    //         HttpClientInitializer = credential,
-    //         ApplicationName = "PhoneBook App"
-    //     });
+    // public static async Task GetUserEmail() //QST dodelat
+    //  {
+    //      var gmail = new GmailService(new BaseClientService.Initializer)
+    //      {
+    //          HttpClientInitializer = credential,
+    //          ApplicationName = "PhoneBook App"
+    //      });
 
-    //     var profile = await gmail.Users.GetProfile("me").ExecuteAsync();
-    //     string userEmail = profile.EmailAddress;
-    // }
+    //      var profile = await gmail.Users.GetProfile("me").ExecuteAsync();
+    //      string userEmail = profile.EmailAddress;
+    //  }
 
 }
