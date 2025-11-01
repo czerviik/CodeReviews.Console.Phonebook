@@ -2,18 +2,16 @@
 using Google.Apis.Auth.OAuth2;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualBasic;
 
 namespace PhoneBook;
 
 internal class Program
 {
-    public static UserCredential? Credentials { get; private set; }
 
     private static async Task Main(string[] args)
     {
-        var menuManager = new MenuManager();
-        Credentials = await GoogleAuthService.GetGmailCredentialsAsync(); //QST je to tady spravne?
+        var credentials = await GoogleAuthService.GetGmailCredentialsAsync();
+        var menuManager = new MenuManager(credentials);
 
         try
         {

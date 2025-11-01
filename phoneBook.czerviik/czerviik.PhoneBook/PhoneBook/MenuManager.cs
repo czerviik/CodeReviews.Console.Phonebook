@@ -1,12 +1,17 @@
+using Google.Apis.Auth.OAuth2;
+using Microsoft.Identity.Client.Platforms.Features.DesktopOs.Kerberos;
+
 namespace PhoneBook;
 
 public class MenuManager
 {
     private readonly Stack<Menu> _menuStack = new Stack<Menu>();
+    private readonly UserCredential _credentials;
 
-    public MenuManager()
+    public MenuManager(UserCredential credentials)
     {
-        _menuStack.Push(new MainMenu(this));
+        _credentials = credentials;
+        _menuStack.Push(new MainMenu(this, _credentials));
     }
 
     public void DisplayCurrentMenu()

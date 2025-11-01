@@ -124,7 +124,7 @@ public class ContactsController
     }
         private static void SetDefaultPhone(ContactsContext context, PhoneNumber phoneNumber)
     {   
-        if (UserInterface.ConfirmDefaultNumber())
+        if (UserInterface.Confirm("Mark this as the default number?"))
         {
             if (phoneNumber != null)
             {

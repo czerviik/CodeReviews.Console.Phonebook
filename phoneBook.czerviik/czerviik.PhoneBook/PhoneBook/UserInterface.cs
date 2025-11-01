@@ -32,6 +32,7 @@ public static partial class UserInterface
         Header("contacts");
         DisplayContactTable(contacts,page);
         var options = new List<MenuOptions> {
+                MenuOptions.SendEmail,
                 MenuOptions.AddContact,
                 MenuOptions.EditContact,
                 MenuOptions.Back};
@@ -146,19 +147,9 @@ public static partial class UserInterface
                     contact.DateModified.ToString("yyyy-MM-dd, HH:mm:ss")
                     );
     }
-    public static bool ConfirmDefaultNumber()
+    public static bool Confirm(string message)
     {
-        Console.WriteLine("Mark this as the default number?");
-        MenuOptions[] options = {
-                MenuOptions.Yes,
-                MenuOptions.No};
-
-        ChooseOptions(options);
-        return OptionChoice == MenuOptions.Yes;
-    }
-    public static bool ConfirmDelete()
-    {
-        Console.WriteLine("Do you really want to delete?");
+        Console.WriteLine(message);
         MenuOptions[] options = {
                 MenuOptions.Yes,
                 MenuOptions.No};
@@ -191,7 +182,7 @@ public static partial class UserInterface
         if (message == "")
             Console.WriteLine($"\nPress any key to {actionMessage}...");
         else
-            Console.WriteLine($"\n{message} Press any key to {actionMessage}...");
+            Console.WriteLine($"{message}\nPress any key to {actionMessage}...");
 
         Console.ReadKey();
     }
