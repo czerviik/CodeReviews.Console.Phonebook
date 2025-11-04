@@ -17,6 +17,10 @@ internal class ContactsContext : DbContext
         modelBuilder.Entity<Contact>()
             .Property(c => c.DateModified)
             .HasDefaultValueSql("GETDATE()");
+        modelBuilder.Entity<Contact>()
+            .Property(c => c.Category)
+            .HasDefaultValue("-");
+
 
         modelBuilder.Entity<Contact>()
             .HasMany(c => c.PhoneNumbers)

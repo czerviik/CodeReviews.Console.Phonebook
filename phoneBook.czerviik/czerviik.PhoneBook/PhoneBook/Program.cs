@@ -68,10 +68,12 @@ public enum PageModifier
     Decrease,
     None
 }
-public enum EditProperty
+
+public enum Categories
 {
-    Name,
-    Email,
-    Phone,
-    Category
+    None,
+    Family,
+    Work,
+    Friends,
+    Enemies
 }

@@ -107,6 +107,7 @@ public class AddContactMenu : Menu
 
     public override void Display()
     {
+        UserInterface.AddContactMenu();
         ContactsController.AddContact();
         UserInterface.DisplayMessage("Contact added.", "return to main menu");
         MenuManager.GoBack();
@@ -137,6 +138,10 @@ public class EditContactMenu : Menu
         {
             case MenuOptions.EditName:
                 ContactsController.EditName(Contact);
+                MenuManager.DisplayCurrentMenu();
+                break;
+            case MenuOptions.EditCategory:
+                ContactsController.EditCategory(Contact);
                 MenuManager.DisplayCurrentMenu();
                 break;
             case MenuOptions.EditEmail:

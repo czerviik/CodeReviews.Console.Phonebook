@@ -1,5 +1,6 @@
 using Spectre.Console;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace PhoneBook;
 
@@ -7,22 +8,20 @@ public class ContactsController
 {
     internal static void AddContact()
     {
-      try
-      {
-          using var context = new ContactsContext();
-          var contact = new Contact
-          {
-              Name = Utils.GetUserName(),
-              Email = Utils.GetUserEmail(context),
-          };
-          contact.PhoneNumbers.Add(new PhoneNumber {Number = Utils.GetUserPhone()});
-          context.Add(contact);
-          context.SaveChanges();
-      }
-      catch (Exception ex) //podchytit connection exception
-      {
-            UserInterface.DisplayMessage($"Connection lost. Er:{ex.Message}","return to main menu",true);
-      }
+        using var context = new ContactsContext();
+        var contact = new Contact
+        {
+            Name = Utils.GetUserName(),
+            Email = Utils.GetUserEmail(context),
+        };
+        var userCategory = Utils.GetCategory();
+        if (userCategory != "None") contact.Category = userCategory;
+        AnsiConsole.MarkupLine($"Contact's category: [yellow]{contact.Category}[/]");
+
+        contact.PhoneNumbers.Add(new PhoneNumber {Number = Utils.GetUserPhone()});
+        context.Add(contact);
+        context.SaveChanges();
+
     }
     internal static void AddPhone(Contact contact)
     {
@@ -88,12 +87,23 @@ public class ContactsController
             UserInterface.DisplayMessage("Contact couldn't be found.");
         }
     }
+    internal static void EditCategory(Contact contact)
+    {
+        using var context = new ContactsContext();
+        if (contact != null)
+        {
+            contact.Category = Utils.GetCategory();
+            UserInterface.DisplayMessage("Contact's category updated.");
+            context.Contacts.Update(contact);
+            context.SaveChanges();
+        }
+    }
     internal static void EditEmail(Contact contact)
     {
         using var context = new ContactsContext();
         if (contact != null)
         {
-            contact.Email = Utils.GetUserEmail(context,contact.Email);
+            contact.Email = Utils.GetUserEmail(context, contact.Email);
             context.Contacts.Update(contact);
             context.SaveChanges();
         }
@@ -114,7 +124,6 @@ public class ContactsController
                 if(!phoneNumber.Default)
                     SetDefaultPhone(context, phoneNumber);
                 UserInterface.DisplayMessage("Contact's phone number modified.");
-                //context.PhoneNumbers.Update(phoneNumber);
                 context.SaveChanges();
             }
             else UserInterface.DisplayMessage("Phone number couldn't be found.");

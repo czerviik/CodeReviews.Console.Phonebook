@@ -4,6 +4,7 @@ using Azure;
 using Microsoft.VisualBasic;
 using Spectre.Console;
 using System.Text.RegularExpressions;
+using Microsoft.IdentityModel.Tokens;
 
 namespace PhoneBook;
 
@@ -11,7 +12,7 @@ public static partial class UserInterface
 {
     internal static MenuOptions OptionChoice { get; private set; }
     internal static string? NumberChoice { get; private set; }
-    const int MAX_ROWS = 4;
+    const int MAX_ROWS = 10;
     internal static int page = 1;
     public static void MainMenu()
     {
@@ -46,6 +47,10 @@ public static partial class UserInterface
 
         
     }
+    public static void AddContactMenu()
+    {
+        Header("add contact");
+    }
     public static void ContactEditMenu(Contact contact)
     {
         Header("edit contact");
@@ -53,6 +58,7 @@ public static partial class UserInterface
 
         var options = new List<MenuOptions> {
                 MenuOptions.EditName,
+                MenuOptions.EditCategory,
                 MenuOptions.EditEmail,
                 MenuOptions.EditPhone,
                 MenuOptions.AddPhone,
@@ -109,16 +115,17 @@ public static partial class UserInterface
     internal static void FormatTableData(List<Contact> contacts, Table table, int page)
     {
         table
-        .AddColumns("Id", "Name", "E-mail", "Phone number", "Date created", "Date modified")
+        .AddColumns("Id", "Name", "Category", "E-mail", "Phone number", "Date created", "Date modified")
         .Border(TableBorder.Rounded);
         int startingRow = (page * MAX_ROWS) - MAX_ROWS;
 
 
         for (int i = startingRow; i < startingRow + MAX_ROWS && i < contacts.Count; i++)
         {
-
+            contacts[i].Category = contacts[i].Category.IsNullOrEmpty() ? "-" : contacts[i].Category;
             table.AddRow(contacts[i].Id.ToString(),
                         contacts[i].Name,
+                        contacts[i].Category,
                         contacts[i].Email,
                         contacts[i].PhoneNumbers
                         .OrderByDescending(p => p.Default)
@@ -132,12 +139,14 @@ public static partial class UserInterface
     internal static void FormatTableData(Contact contact, Table table, int page)
     {
         table
-        .AddColumns("Id", "Name", "E-mail", "Phone number", "Date created", "Date modified")
+        .AddColumns("Id", "Name", "Category", "E-mail", "Phone number", "Date created", "Date modified")
         .Border(TableBorder.Rounded);
         int startingRow = (page * MAX_ROWS) - MAX_ROWS;
 
+        contact.Category = contact.Category.IsNullOrEmpty() ? "-" : contact.Category; 
         table.AddRow(contact.Id.ToString(),
                     contact.Name,
+                    contact.Category,
                     contact.Email,
                     contact.PhoneNumbers
                     .OrderByDescending(p => p.Default)
@@ -189,4 +198,6 @@ public static partial class UserInterface
 
     [GeneratedRegex(@"\[[^\]]+\]")]
     private static partial Regex MyRegex();
+
+
 }

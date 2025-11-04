@@ -4,6 +4,7 @@ using Spectre.Console;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection.Metadata.Ecma335;
+using System;
 
 public static class Utils
 {
@@ -31,6 +32,7 @@ public static class Utils
     internal static string GetUserEmail(ContactsContext context, string email = "")
     {
         var isEdit = email != "";
+        var originalEmail = email;
         while (true)
         {
             email = AnsiConsole.Prompt(
@@ -43,17 +45,22 @@ public static class Utils
                 Console.WriteLine("Invalid email.");
             else if (!context.Contacts.AsNoTracking().Any(c => c.Email == email))
             {
-                UserInterface.DisplayMessage("Contact's e-mail was modified.");
+                if (isEdit)
+                    UserInterface.DisplayMessage("Contact's e-mail was modified.");
+                
                 break;
             }
 
             else if (isEdit)
-                {
-                    UserInterface.DisplayMessage("Contact's e-mail was not modified.");
-                    break;
-                }
+            {
+                UserInterface.DisplayMessage("Contact's e-mail was not modified.");
+                break;
+            }
             else
+            {
                 Console.WriteLine("Email already used.");
+                email = originalEmail;
+            }
         }
         return email;
     }
@@ -83,5 +90,13 @@ public static class Utils
                 
         }
         return phoneNum;
+    }
+
+    internal static string GetCategory()
+    {
+        return AnsiConsole.Prompt(new SelectionPrompt<Categories>()
+        .Title("Select a category:")
+        .HighlightStyle("yellow")
+        .AddChoices(Enum.GetValues<Categories>())).ToString();
     }
 }

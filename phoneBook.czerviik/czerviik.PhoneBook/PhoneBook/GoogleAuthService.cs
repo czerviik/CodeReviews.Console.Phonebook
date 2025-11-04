@@ -38,16 +38,4 @@ public static class GoogleAuthService
             CancellationToken.None,
             new FileDataStore(tokenFolder, true));
     }
-    // public static async Task GetUserEmail() //QST dodelat
-    //  {
-    //      var gmail = new GmailService(new BaseClientService.Initializer)
-    //      {
-    //          HttpClientInitializer = credential,
-    //          ApplicationName = "PhoneBook App"
-    //      });
-
-    //      var profile = await gmail.Users.GetProfile("me").ExecuteAsync();
-    //      string userEmail = profile.EmailAddress;
-    //  }
-
 }
