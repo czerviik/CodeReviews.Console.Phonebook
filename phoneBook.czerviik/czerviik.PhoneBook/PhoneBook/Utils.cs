@@ -2,8 +2,6 @@ namespace PhoneBook;
 
 using Spectre.Console;
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
-using System.Reflection.Metadata.Ecma335;
 using System;
 
 public static class Utils
@@ -50,7 +48,6 @@ public static class Utils
                 
                 break;
             }
-
             else if (isEdit)
             {
                 UserInterface.DisplayMessage("Contact's e-mail was not modified.");
@@ -91,7 +88,6 @@ public static class Utils
         }
         return phoneNum;
     }
-
     internal static string GetCategory()
     {
         return AnsiConsole.Prompt(new SelectionPrompt<Categories>()

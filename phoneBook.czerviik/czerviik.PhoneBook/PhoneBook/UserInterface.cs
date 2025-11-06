@@ -1,7 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-using System.Reflection;
-using Azure;
-using Microsoft.VisualBasic;
 using Spectre.Console;
 using System.Text.RegularExpressions;
 using Microsoft.IdentityModel.Tokens;
@@ -44,8 +40,6 @@ public static partial class UserInterface
             options.Insert(0,MenuOptions.NextPage);
 
         ChooseOptions(options.ToArray());
-
-        
     }
     public static void AddContactMenu()
     {
@@ -68,14 +62,12 @@ public static partial class UserInterface
         };
 
         ChooseOptions(options.ToArray());
-
     }
     public static void SendEmailMenu(Contact contact)
     {
         Header("send email");
         DisplayContactTable(contact);
     }
-    
     public static void AllContactNumbers(List<PhoneNumber> phoneNumbers)
     {
         AnsiConsole.MarkupLine("EDIT PHONE NUMBER: ");
@@ -111,7 +103,6 @@ public static partial class UserInterface
         FormatTableData(contact, table, page);
         AnsiConsole.Write(table);
     }
-
     internal static void FormatTableData(List<Contact> contacts, Table table, int page)
     {
         table
@@ -166,14 +157,12 @@ public static partial class UserInterface
         ChooseOptions(options);
         return OptionChoice == MenuOptions.Yes;
     }
-
     private static void Header(string headerText)
     {
         Console.Clear();
         Console.WriteLine($"----- {headerText.ToUpper()} -----");
         Console.WriteLine();
     }
-
     private static void ChooseOptions(MenuOptions[] options)
     {
         OptionChoice = AnsiConsole.Prompt(
@@ -182,8 +171,6 @@ public static partial class UserInterface
             .AddChoices(options)
             );
     }
-
-
     public static void DisplayMessage(string message = "", string actionMessage = "continue", bool consoleClear = false)
     {
         if (consoleClear) Console.Clear();
@@ -198,6 +185,4 @@ public static partial class UserInterface
 
     [GeneratedRegex(@"\[[^\]]+\]")]
     private static partial Regex MyRegex();
-
-
 }

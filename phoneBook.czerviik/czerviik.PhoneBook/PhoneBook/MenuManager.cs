@@ -1,7 +1,6 @@
-using Google.Apis.Auth.OAuth2;
-using Microsoft.Identity.Client.Platforms.Features.DesktopOs.Kerberos;
-
 namespace PhoneBook;
+
+using Google.Apis.Auth.OAuth2;
 
 public class MenuManager
 {
@@ -13,7 +12,6 @@ public class MenuManager
         _credentials = credentials;
         _menuStack.Push(new MainMenu(this, _credentials));
     }
-
     public void DisplayCurrentMenu()
     {
         if (_menuStack.Count > 0)
@@ -22,27 +20,23 @@ public class MenuManager
             currentMenu.Display();
         }
     }
-
     public void NewMenu(Menu menu)
     {
         _menuStack.Push(menu);
         DisplayCurrentMenu();
     }
-
     public void GoBack()
     {
         if (_menuStack.Count > 1)
             _menuStack.Pop();
         DisplayCurrentMenu();
     }
-
     public void ReturnToMainMenu()
     {
         while (_menuStack.Count > 1)
             _menuStack.Pop();
         DisplayCurrentMenu();
     }
-
     public void Close()
     {
         Console.Clear();

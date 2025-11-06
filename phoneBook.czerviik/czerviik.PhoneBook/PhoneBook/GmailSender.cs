@@ -12,7 +12,6 @@ public class GmailSender
 {
     private readonly UserCredential _credentials;
     private readonly string _userEmail;
-
     public GmailSender(UserCredential credentials)
     {
         _credentials = credentials;
@@ -24,6 +23,7 @@ public class GmailSender
             HttpClientInitializer = _credentials,
             ApplicationName = "PhoneBook"
         });
+
         try
         {
             var profile = await gmailService.Users.GetProfile("me").ExecuteAsync();
@@ -42,12 +42,12 @@ public class GmailSender
 
             await client.SendAsync(message);
             await client.DisconnectAsync(true);
-        }   catch (Google.GoogleApiException ex)
-            {
-                Console.WriteLine($"Code: {ex.Error.Code}");
-                Console.WriteLine($"Message: {ex.Error.Message}");
-                throw;
-            }
+        }
+        catch (Google.GoogleApiException ex)
+        {
+            Console.WriteLine($"Code: {ex.Error.Code}");
+            Console.WriteLine($"Message: {ex.Error.Message}");
+            throw;
+        }
     }
-
 }

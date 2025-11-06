@@ -1,9 +1,7 @@
-﻿using System.Threading.Tasks;
-using Google.Apis.Auth.OAuth2;
+﻿namespace PhoneBook;
+
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-
-namespace PhoneBook;
 
 internal class Program
 {
@@ -39,7 +37,6 @@ internal class Program
             Environment.Exit(1);
         }
     }
-
 }
 
 public enum MenuOptions

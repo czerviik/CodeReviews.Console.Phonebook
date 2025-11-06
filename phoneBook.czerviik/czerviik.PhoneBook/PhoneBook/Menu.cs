@@ -1,7 +1,6 @@
 using Spectre.Console;
 using MimeKit;
 using Google.Apis.Auth.OAuth2;
-using System.Threading.Tasks;
 
 namespace PhoneBook;
 
@@ -24,14 +23,13 @@ public class MainMenu : Menu
     public MainMenu(MenuManager menuManager,UserCredential credentials) : base(menuManager,credentials)
     {
         _credentials = credentials;
-     }
+    }
 
     public override void Display()
     {
         UserInterface.MainMenu();
         HandleUserOptions();
     }
-
     private void HandleUserOptions()
     {
         switch (UserInterface.OptionChoice)
@@ -67,7 +65,6 @@ public class AllContactsMenu : Menu
         UserInterface.AllContactsMenu(contacts, pageMod);
         HandleUserOptions();
     }
-
     private void HandleUserOptions()
     {
         switch (UserInterface.OptionChoice)
@@ -214,7 +211,6 @@ public class SendEmail : Menu
         UserInterface.SendEmailMenu(contact);
         ConstructEmail(contact).GetAwaiter().GetResult();
     }
-
     private async Task ConstructEmail(Contact contact)
     {
         {
@@ -240,5 +236,4 @@ public class SendEmail : Menu
             }
         }
     }
-
 }

@@ -17,10 +17,10 @@ internal class ContactsContext : DbContext
         modelBuilder.Entity<Contact>()
             .Property(c => c.DateModified)
             .HasDefaultValueSql("GETDATE()");
+
         modelBuilder.Entity<Contact>()
             .Property(c => c.Category)
             .HasDefaultValue("-");
-
 
         modelBuilder.Entity<Contact>()
             .HasMany(c => c.PhoneNumbers)
@@ -41,28 +41,27 @@ internal class ContactsContext : DbContext
     }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder.UseSqlServer(cfg.GetConnectionString());
     public override int SaveChanges()
-{
-        foreach (var entry in ChangeTracker.Entries<Contact>())
-        {
-            if (entry.State == EntityState.Added)
-                entry.Entity.DateAdded = DateTime.Now;
-            if (entry.State == EntityState.Modified||entry.State == EntityState.Added)
-                entry.Entity.DateModified = DateTime.Now;
-        }
-        foreach (var entry in ChangeTracker.Entries<PhoneNumber>())
-        {
-            if (entry.State == EntityState.Added)
-                entry.Entity.DateAdded = DateTime.Now;
-            if (entry.State == EntityState.Modified || entry.State == EntityState.Added)
-                entry.Entity.DateModified = DateTime.Now;
-            if (entry.State == EntityState.Modified)
+    {
+            foreach (var entry in ChangeTracker.Entries<Contact>())
             {
-                var contact = Contacts.FirstOrDefault(c => c.Id == entry.Entity.ContactId);
-                if (contact != null)
-                    contact.DateModified = DateTime.Now;
+                if (entry.State == EntityState.Added)
+                    entry.Entity.DateAdded = DateTime.Now;
+                if (entry.State == EntityState.Modified||entry.State == EntityState.Added)
+                    entry.Entity.DateModified = DateTime.Now;
             }
-        }
-    return base.SaveChanges();
-}
-
+            foreach (var entry in ChangeTracker.Entries<PhoneNumber>())
+            {
+                if (entry.State == EntityState.Added)
+                    entry.Entity.DateAdded = DateTime.Now;
+                if (entry.State == EntityState.Modified || entry.State == EntityState.Added)
+                    entry.Entity.DateModified = DateTime.Now;
+                if (entry.State == EntityState.Modified)
+                {
+                    var contact = Contacts.FirstOrDefault(c => c.Id == entry.Entity.ContactId);
+                    if (contact != null)
+                        contact.DateModified = DateTime.Now;
+                }
+            }
+        return base.SaveChanges();
+    }
 }

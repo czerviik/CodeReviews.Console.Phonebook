@@ -1,9 +1,9 @@
 namespace PhoneBook;
+
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Util.Store;
 using System.Threading;
 using System.Threading.Tasks;
-
 
 public static class GoogleAuthService
 {

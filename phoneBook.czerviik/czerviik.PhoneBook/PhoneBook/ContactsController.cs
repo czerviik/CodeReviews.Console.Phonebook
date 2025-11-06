@@ -21,7 +21,6 @@ public class ContactsController
         contact.PhoneNumbers.Add(new PhoneNumber {Number = Utils.GetUserPhone()});
         context.Add(contact);
         context.SaveChanges();
-
     }
     internal static void AddPhone(Contact contact)
     {
@@ -114,7 +113,6 @@ public class ContactsController
     }
     internal static void EditPhone(Contact contact, PhoneNumber phoneNumber)
     {
-
         using var context = new ContactsContext();
         if (contact != null)
         {
@@ -127,11 +125,10 @@ public class ContactsController
                 context.SaveChanges();
             }
             else UserInterface.DisplayMessage("Phone number couldn't be found.");
-
         }
         else UserInterface.DisplayMessage("Contact couldn't be found.");
     }
-        private static void SetDefaultPhone(ContactsContext context, PhoneNumber phoneNumber)
+    private static void SetDefaultPhone(ContactsContext context, PhoneNumber phoneNumber)
     {   
         if (UserInterface.Confirm("Mark this as the default number?"))
         {
@@ -167,5 +164,4 @@ public class ContactsController
         using var context = new ContactsContext();
         return context.Contacts.Any(c => c.Id == id);
     }
-
 }
