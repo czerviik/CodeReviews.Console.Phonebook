@@ -2,7 +2,6 @@ using Spectre.Console;
 using Microsoft.EntityFrameworkCore;
 
 namespace PhoneBook;
-
 public class ContactsController
 {
     internal static void AddContact()
@@ -160,7 +159,6 @@ public class ContactsController
                 phoneNum.Default = false;
         }
     }
-    
     internal static bool IdExists(int id)
     {
         using var context = new ContactsContext();

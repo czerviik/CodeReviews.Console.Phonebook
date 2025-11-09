@@ -3,11 +3,9 @@ using MimeKit;
 using Google.Apis.Auth.OAuth2;
 
 namespace PhoneBook;
-
 public abstract class Menu
 {
     protected MenuManager MenuManager { get; }
-
     protected Menu(MenuManager menuManager)
     {
         MenuManager = menuManager;
@@ -18,7 +16,6 @@ public abstract class Menu
 public class MainMenu : Menu
 {
     public MainMenu(MenuManager menuManager) : base(menuManager){}
-
     public override void Display()
     {
         UserInterface.ContactsPage = 1;
@@ -48,7 +45,6 @@ public class MainMenu : Menu
         }
     }
 }
-
 public class AllContactsMenu : Menu
 {
     private List<Contact> contacts;
@@ -95,7 +91,6 @@ public class AllContactsMenu : Menu
 public class AddContactMenu : Menu
 {
     public AddContactMenu(MenuManager menuManager) : base(menuManager) { }
-
     public override void Display()
     {
         UserInterface.AddContactMenu();
@@ -187,7 +182,6 @@ public class SendEmail : Menu
 {
     private int Id { get; }
     private readonly UserCredential _credentials;
-
     public SendEmail(MenuManager menuManager) : base(menuManager)
     {
         _credentials = GoogleAuthService.GetGmailCredentialsAsync().GetAwaiter().GetResult(); 
@@ -199,7 +193,6 @@ public class SendEmail : Menu
             else UserInterface.DisplayMessage("Wrong ID.");
         }
     }
-
     public override void Display()
     {
         var contact = ContactsController.GetContactById(Id);

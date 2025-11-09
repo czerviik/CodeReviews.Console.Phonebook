@@ -2,7 +2,6 @@ using Spectre.Console;
 using System.Text.RegularExpressions;
 
 namespace PhoneBook;
-
 public static partial class UserInterface
 {
     internal static MenuOptions OptionChoice { get; private set; }
@@ -112,7 +111,6 @@ public static partial class UserInterface
         .AddColumns("Id", "Name", "Category", "E-mail", "Phone number", "Date created", "Date modified")
         .Border(TableBorder.Rounded);
         int startingRow = (page * MAX_ROWS) - MAX_ROWS;
-
 
         for (int i = startingRow; i < startingRow + MAX_ROWS && i < contacts.Count; i++)
         {

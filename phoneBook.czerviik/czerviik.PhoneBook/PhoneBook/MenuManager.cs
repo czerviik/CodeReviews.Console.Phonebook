@@ -1,7 +1,4 @@
 namespace PhoneBook;
-
-using Google.Apis.Auth.OAuth2;
-
 public class MenuManager
 {
     private readonly Stack<Menu> _menuStack = new Stack<Menu>();

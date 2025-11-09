@@ -2,7 +2,6 @@
 
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-
 internal class Program
 {
     internal static bool EfSqlLoggingEnabled { get; set; } = false;
@@ -39,7 +38,6 @@ internal class Program
         }
     }
 }
-
 public enum MenuOptions
 {
     ShowAllContacts,
@@ -67,7 +65,6 @@ public enum PageModifier
     Decrease,
     None
 }
-
 public enum Categories
 {
     None,

@@ -1,11 +1,9 @@
 using Microsoft.Extensions.Configuration;
 
 namespace PhoneBook;
-
 public class ConfigReader
 {
     public IConfigurationRoot Configuration { get; }
-
     public ConfigReader()
     {
         Configuration = new ConfigurationBuilder()
@@ -13,7 +11,7 @@ public class ConfigReader
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
             .Build();
     }
-
+    
 #nullable enable
     public string GetConnectionString()
     {
