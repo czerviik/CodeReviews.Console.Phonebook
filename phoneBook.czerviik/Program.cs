@@ -4,13 +4,11 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 internal class Program
 {
-    internal static bool EfSqlLoggingEnabled { get; set; } = false;
+    internal static bool EfSqlLoggingEnabled { get; set; }
     internal static string LogPath { get; set; } = Path.Combine(AppContext.BaseDirectory, "ef-sql.log");
-
     private static void Main(string[] args)
     {
         var menuManager = new MenuManager();
-
         try
         {
             using var contactsContext = new ContactsContext();

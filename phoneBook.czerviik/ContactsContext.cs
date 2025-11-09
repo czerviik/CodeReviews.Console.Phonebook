@@ -46,7 +46,6 @@ internal class ContactsContext : DbContext
 
         if (Program.EfSqlLoggingEnabled)
         {
-            var logWriter = new StreamWriter(logFile, append: true) { AutoFlush = true };
             optionsBuilder
             .EnableSensitiveDataLogging()
             .LogTo(msg =>

@@ -201,27 +201,25 @@ public class SendEmail : Menu
     }
     private async Task ConstructEmail(Contact contact)
     {
+        string receiverAddress = contact.Email;
+        var message = new MimeMessage();
+
+        message.To.Add(new MailboxAddress(receiverAddress));
+        message.Subject = "A message from PhoneBook";
+
+        message.Body = new TextPart("plain")
         {
-            string receiverAddress = contact.Email;
-            var message = new MimeMessage();
-
-            message.To.Add(new MailboxAddress(receiverAddress));
-            message.Subject = "A message from PhoneBook";
-
-            message.Body = new TextPart("plain")
-            {
-                Text = AnsiConsole.Prompt(
-                    new TextPrompt<string>("Message: ")
-                        .PromptStyle("green")
-                )
-            };
-            if (UserInterface.Confirm("Send email?"))
-            {
-                var gmailSender = new GmailSender(_credentials);
-                await gmailSender.SendMailAsync(message);
-                UserInterface.DisplayMessage("Message sent!", "go back");
-                MenuManager.GoBack();
-            }
+            Text = AnsiConsole.Prompt(
+                new TextPrompt<string>("Message: ")
+                    .PromptStyle("green")
+            )
+        };
+        if (UserInterface.Confirm("Send email?"))
+        {
+            var gmailSender = new GmailSender(_credentials);
+            await gmailSender.SendMailAsync(message);
+            UserInterface.DisplayMessage("Message sent!", "go back");
+            MenuManager.GoBack();
         }
     }
 }
