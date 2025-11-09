@@ -8,7 +8,7 @@ public static partial class UserInterface
     internal static string? NumberChoice { get; private set; }
     internal static PageModifier PageMod = PageModifier.None;
     internal static int ContactsPage = 1;
-    const int MAX_ROWS = 10;
+    const int MAX_ROWS = 8;
     public static void MainMenu()
     {
         Header("phone book");

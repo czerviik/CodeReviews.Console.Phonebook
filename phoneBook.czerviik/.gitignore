@@ -1,6 +1,5 @@
 # Sensitive files
 credentials.json
-PhoneBook/credentials.json
 token.json
 google-token/
 Migrations/
