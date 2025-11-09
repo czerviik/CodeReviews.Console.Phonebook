@@ -1,6 +1,5 @@
 using Spectre.Console;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace PhoneBook;
 
@@ -78,7 +77,8 @@ public class ContactsController
         {
             contact.Name = Utils.GetUserName(contact.Name);
             UserInterface.DisplayMessage("Contact's name modified.");
-            context.Contacts.Update(contact);
+            context.Contacts.Attach(contact);
+            context.Entry(contact).Property(p => p.Name).IsModified = true;
             context.SaveChanges();
         }
         else
@@ -93,7 +93,9 @@ public class ContactsController
         {
             contact.Category = Utils.GetCategory();
             UserInterface.DisplayMessage("Contact's category updated.");
-            context.Contacts.Update(contact);
+
+            context.Contacts.Attach(contact);
+            context.Entry(contact).Property(p => p.Category).IsModified = true;
             context.SaveChanges();
         }
     }
@@ -103,7 +105,9 @@ public class ContactsController
         if (contact != null)
         {
             contact.Email = Utils.GetUserEmail(context, contact.Email);
-            context.Contacts.Update(contact);
+
+            context.Contacts.Attach(contact);
+            context.Entry(contact).Property(p => p.Email).IsModified = true;
             context.SaveChanges();
         }
         else
@@ -122,6 +126,10 @@ public class ContactsController
                 if(!phoneNumber.Default)
                     SetDefaultPhone(context, phoneNumber);
                 UserInterface.DisplayMessage("Contact's phone number modified.");
+
+                context.Attach(phoneNumber);
+                context.Entry(phoneNumber).Property(p => p.Number).IsModified = true;
+                context.Entry(phoneNumber).Property(p => p.Default).IsModified = true;
                 context.SaveChanges();
             }
             else UserInterface.DisplayMessage("Phone number couldn't be found.");
@@ -129,16 +137,17 @@ public class ContactsController
         else UserInterface.DisplayMessage("Contact couldn't be found.");
     }
     private static void SetDefaultPhone(ContactsContext context, PhoneNumber phoneNumber)
-    {   
+    {
         if (UserInterface.Confirm("Mark this as the default number?"))
         {
             if (phoneNumber != null)
             {
-                UndefaultPhoneNumbers(context,phoneNumber.ContactId);
-                var phoneToUpdate = context.PhoneNumbers.First(p => p.Id == phoneNumber.Id);
-                phoneToUpdate.Default = true;
+                UndefaultPhoneNumbers(context, phoneNumber.ContactId);
+                phoneNumber.Default = true;
             }
-        }        
+        }
+        else
+            phoneNumber.Default = false;        
     }
     private static void UndefaultPhoneNumbers(ContactsContext context, int contactId)
     {
@@ -150,13 +159,6 @@ public class ContactsController
             foreach (var phoneNum in phoneNumbers)
                 phoneNum.Default = false;
         }
-    }
-    internal static List<PhoneNumber> GetContactNumbers(Contact contact)
-    {
-        using var context = new ContactsContext();
-        return contact.PhoneNumbers
-        .Where(p => p.ContactId == contact.Id)
-        .ToList();
     }
     
     internal static bool IdExists(int id)

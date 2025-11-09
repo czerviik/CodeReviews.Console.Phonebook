@@ -5,11 +5,12 @@ using Microsoft.EntityFrameworkCore;
 
 internal class Program
 {
+    internal static bool EfSqlLoggingEnabled { get; set; } = false;
+    internal static string LogPath { get; set; } = Path.Combine(AppContext.BaseDirectory, "ef-sql.log");
 
-    private static async Task Main(string[] args)
+    private static void Main(string[] args)
     {
-        var credentials = await GoogleAuthService.GetGmailCredentialsAsync();
-        var menuManager = new MenuManager(credentials);
+        var menuManager = new MenuManager();
 
         try
         {
@@ -43,6 +44,7 @@ public enum MenuOptions
 {
     ShowAllContacts,
     AddContact,
+    DevMode,
     EditContact,
     DeleteContact,
     Back,

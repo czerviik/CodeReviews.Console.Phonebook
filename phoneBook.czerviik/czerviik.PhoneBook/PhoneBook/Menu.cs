@@ -7,26 +7,21 @@ namespace PhoneBook;
 public abstract class Menu
 {
     protected MenuManager MenuManager { get; }
-    private readonly UserCredential _credentials;
 
-    protected Menu(MenuManager menuManager, UserCredential credentials)
+    protected Menu(MenuManager menuManager)
     {
         MenuManager = menuManager;
-        _credentials = credentials;
     }
 
     public abstract void Display();
 }
 public class MainMenu : Menu
 {
-    private readonly UserCredential _credentials;
-    public MainMenu(MenuManager menuManager,UserCredential credentials) : base(menuManager,credentials)
-    {
-        _credentials = credentials;
-    }
+    public MainMenu(MenuManager menuManager) : base(menuManager){}
 
     public override void Display()
     {
+        UserInterface.ContactsPage = 1;
         UserInterface.MainMenu();
         HandleUserOptions();
     }
@@ -35,10 +30,14 @@ public class MainMenu : Menu
         switch (UserInterface.OptionChoice)
         {
             case MenuOptions.ShowAllContacts:
-                MenuManager.NewMenu(new AllContactsMenu(MenuManager,_credentials));
+                MenuManager.NewMenu(new AllContactsMenu(MenuManager));
                 break;
             case MenuOptions.AddContact:
-                MenuManager.NewMenu(new AddContactMenu(MenuManager,_credentials));
+                MenuManager.NewMenu(new AddContactMenu(MenuManager));
+                break;
+            case MenuOptions.DevMode:
+                Program.EfSqlLoggingEnabled = !Program.EfSqlLoggingEnabled;
+                MenuManager.DisplayCurrentMenu();
                 break;
             case MenuOptions.Exit:
                 MenuManager.Close();
@@ -53,16 +52,11 @@ public class MainMenu : Menu
 public class AllContactsMenu : Menu
 {
     private List<Contact> contacts;
-    private readonly UserCredential _credentials;
-    private PageModifier pageMod = PageModifier.None;
-    public AllContactsMenu(MenuManager menuManager, UserCredential credentials) : base(menuManager,credentials)
-    {
-        _credentials = credentials;
-    }
+    public AllContactsMenu(MenuManager menuManager) : base(menuManager){}
     public override void Display()
     {
         contacts = ContactsController.GetContacts();
-        UserInterface.AllContactsMenu(contacts, pageMod);
+        UserInterface.AllContactsMenu(contacts);
         HandleUserOptions();
     }
     private void HandleUserOptions()
@@ -70,15 +64,15 @@ public class AllContactsMenu : Menu
         switch (UserInterface.OptionChoice)
         {
             case MenuOptions.NextPage:
-                pageMod = PageModifier.Increase;
+                UserInterface.PageMod = PageModifier.Increase;
                 MenuManager.DisplayCurrentMenu();
                break;
             case MenuOptions.PreviousPage:
-                pageMod = PageModifier.Decrease;
+                UserInterface.PageMod = PageModifier.Decrease;
                 MenuManager.DisplayCurrentMenu();
                 break;
             case MenuOptions.SendEmail:
-                MenuManager.NewMenu(new SendEmail(MenuManager,_credentials));
+                MenuManager.NewMenu(new SendEmail(MenuManager));
                 break;
             case MenuOptions.AddContact:
                 ContactsController.AddContact();
@@ -86,7 +80,7 @@ public class AllContactsMenu : Menu
                 MenuManager.DisplayCurrentMenu();
                 break;
             case MenuOptions.EditContact:
-                MenuManager.NewMenu(new EditContactMenu(MenuManager,_credentials));
+                MenuManager.NewMenu(new EditContactMenu(MenuManager));
                 MenuManager.DisplayCurrentMenu();
                 break;
             case MenuOptions.Back:
@@ -100,7 +94,7 @@ public class AllContactsMenu : Menu
 }
 public class AddContactMenu : Menu
 {
-    public AddContactMenu(MenuManager menuManager,UserCredential credentials) : base(menuManager,credentials) { }
+    public AddContactMenu(MenuManager menuManager) : base(menuManager) { }
 
     public override void Display()
     {
@@ -114,7 +108,7 @@ public class EditContactMenu : Menu
 {
     internal int Id { get; }
     internal Contact Contact { get; set; }
-    public EditContactMenu(MenuManager menuManager,UserCredential credentials) : base(menuManager,credentials)
+    public EditContactMenu(MenuManager menuManager) : base(menuManager)
     {
         while (true)
         {
@@ -146,7 +140,7 @@ public class EditContactMenu : Menu
                 MenuManager.DisplayCurrentMenu();
                 break;
             case MenuOptions.EditPhone:
-                var contactsNumbers = ContactsController.GetContactNumbers(Contact);
+                var contactsNumbers = Contact.PhoneNumbers.ToList();
                 UserInterface.AllContactNumbers(contactsNumbers);
 
                 var userNumber = contactsNumbers.FirstOrDefault(p => p.Number == UserInterface.NumberChoice);
@@ -159,7 +153,7 @@ public class EditContactMenu : Menu
                 MenuManager.DisplayCurrentMenu();
                 break;
             case MenuOptions.DeletePhone:
-                contactsNumbers = ContactsController.GetContactNumbers(Contact);
+                contactsNumbers = Contact.PhoneNumbers.ToList();
                 UserInterface.AllContactNumbers(contactsNumbers);
                 userNumber = contactsNumbers.FirstOrDefault(p => p.Number == UserInterface.NumberChoice);
                 if (userNumber != null)
@@ -194,9 +188,10 @@ public class SendEmail : Menu
     private int Id { get; }
     private readonly UserCredential _credentials;
 
-    public SendEmail(MenuManager menuManager, UserCredential credentials) : base(menuManager, credentials)
+    public SendEmail(MenuManager menuManager) : base(menuManager)
     {
-        _credentials = credentials;
+        _credentials = GoogleAuthService.GetGmailCredentialsAsync().GetAwaiter().GetResult(); 
+
         while (true)
         {
             Id = AnsiConsole.Ask<int>("Enter the contact's ID: ");

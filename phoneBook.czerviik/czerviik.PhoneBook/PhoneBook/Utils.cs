@@ -34,13 +34,13 @@ public static class Utils
         while (true)
         {
             email = AnsiConsole.Prompt(
-                new TextPrompt<string>("Contact's email: ")
+                new TextPrompt<string>("Contact's email (e. g. test@email.com): ")
                     .DefaultValue(email)
                     .PromptStyle("yellow")
             ).Trim();
 
             if (!ValidateEmail(email))
-                Console.WriteLine("Invalid email.");
+                Console.WriteLine("Invalid email (expected format: test@email.com): ");
             else if (!context.Contacts.AsNoTracking().Any(c => c.Email == email))
             {
                 if (isEdit)
@@ -76,12 +76,12 @@ public static class Utils
         while (true)
         {
             phoneNum = AnsiConsole.Prompt(
-                new TextPrompt<string>("Contact's telephone number (with prefix): ")
+                new TextPrompt<string>("Contact's telephone number (e. g. +420987654321): ")
                     .DefaultValue(phoneNum)
                     .PromptStyle("yellow")
             ).Replace(" ", "");
             if (!ValidatePhone(phoneNum))
-                Console.WriteLine("Invalid phone number.");
+                Console.WriteLine("Invalid phone number (expected format: +420987654321): ");
             else
                 break;
                 

@@ -1,6 +1,5 @@
 using Spectre.Console;
 using System.Text.RegularExpressions;
-using Microsoft.IdentityModel.Tokens;
 
 namespace PhoneBook;
 
@@ -8,8 +7,9 @@ public static partial class UserInterface
 {
     internal static MenuOptions OptionChoice { get; private set; }
     internal static string? NumberChoice { get; private set; }
+    internal static PageModifier PageMod = PageModifier.None;
+    internal static int ContactsPage = 1;
     const int MAX_ROWS = 10;
-    internal static int page = 1;
     public static void MainMenu()
     {
         Header("phone book");
@@ -17,27 +17,30 @@ public static partial class UserInterface
         MenuOptions[] options = {
                 MenuOptions.ShowAllContacts,
                 MenuOptions.AddContact,
+                MenuOptions.DevMode,
                 MenuOptions.Exit};
 
         ChooseOptions(options);
     }
-    public static void AllContactsMenu(List<Contact> contacts, PageModifier pageMod = PageModifier.None)
+    public static void AllContactsMenu(List<Contact> contacts)
     {
-        if (pageMod == PageModifier.Increase) page += 1;
-        else if(pageMod == PageModifier.Decrease) page -= 1;
+        if (PageMod == PageModifier.Increase) ContactsPage += 1;
+        else if(PageMod == PageModifier.Decrease) ContactsPage -= 1;
 
         Header("contacts");
-        DisplayContactTable(contacts,page);
+        DisplayContactTable(contacts,ContactsPage);
         var options = new List<MenuOptions> {
                 MenuOptions.SendEmail,
                 MenuOptions.AddContact,
                 MenuOptions.EditContact,
                 MenuOptions.Back};
         
-        if (contacts.Count > MAX_ROWS && page > 1) 
+        if (contacts.Count > MAX_ROWS && ContactsPage > 1) 
             options.Insert(0,MenuOptions.PreviousPage);
-        if (contacts.Count > MAX_ROWS && page < (double)contacts.Count/MAX_ROWS) 
+        if (contacts.Count > MAX_ROWS && ContactsPage < (double)contacts.Count/MAX_ROWS) 
             options.Insert(0,MenuOptions.NextPage);
+
+        PageMod = PageModifier.None;
 
         ChooseOptions(options.ToArray());
     }
@@ -113,15 +116,14 @@ public static partial class UserInterface
 
         for (int i = startingRow; i < startingRow + MAX_ROWS && i < contacts.Count; i++)
         {
-            contacts[i].Category = contacts[i].Category.IsNullOrEmpty() ? "-" : contacts[i].Category;
             table.AddRow(contacts[i].Id.ToString(),
                         contacts[i].Name,
-                        contacts[i].Category,
+                        contacts[i].Category ?? "-",
                         contacts[i].Email,
                         contacts[i].PhoneNumbers
                         .OrderByDescending(p => p.Default)
                         .ThenByDescending(p => p.DateAdded)
-                        .FirstOrDefault()?.Number,
+                        .FirstOrDefault()?.Number ?? "-",
                         contacts[i].DateAdded.ToString("yyyy-MM-dd, HH:mm:ss"),
                         contacts[i].DateModified.ToString("yyyy-MM-dd, HH:mm:ss")
                         );
@@ -134,15 +136,14 @@ public static partial class UserInterface
         .Border(TableBorder.Rounded);
         int startingRow = (page * MAX_ROWS) - MAX_ROWS;
 
-        contact.Category = contact.Category.IsNullOrEmpty() ? "-" : contact.Category; 
         table.AddRow(contact.Id.ToString(),
                     contact.Name,
-                    contact.Category,
+                    contact.Category ?? "-",
                     contact.Email,
                     contact.PhoneNumbers
                     .OrderByDescending(p => p.Default)
                     .ThenByDescending(p => p.DateAdded)
-                    .FirstOrDefault()?.Number,
+                    .FirstOrDefault()?.Number ?? "-",
                     contact.DateAdded.ToString("yyyy-MM-dd, HH:mm:ss"),
                     contact.DateModified.ToString("yyyy-MM-dd, HH:mm:ss")
                     );
@@ -160,6 +161,8 @@ public static partial class UserInterface
     private static void Header(string headerText)
     {
         Console.Clear();
+        if (Program.EfSqlLoggingEnabled)
+            AnsiConsole.MarkupLine($"[green]//DEV MODE - LOG FILE:[/] [gray]{Program.LogPath}[/]");
         Console.WriteLine($"----- {headerText.ToUpper()} -----");
         Console.WriteLine();
     }

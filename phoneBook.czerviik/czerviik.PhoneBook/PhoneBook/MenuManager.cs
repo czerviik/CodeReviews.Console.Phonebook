@@ -5,12 +5,9 @@ using Google.Apis.Auth.OAuth2;
 public class MenuManager
 {
     private readonly Stack<Menu> _menuStack = new Stack<Menu>();
-    private readonly UserCredential _credentials;
-
-    public MenuManager(UserCredential credentials)
+    public MenuManager()
     {
-        _credentials = credentials;
-        _menuStack.Push(new MainMenu(this, _credentials));
+        _menuStack.Push(new MainMenu(this));
     }
     public void DisplayCurrentMenu()
     {
