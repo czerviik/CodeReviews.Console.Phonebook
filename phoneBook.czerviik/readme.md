@@ -1,4 +1,3 @@
-
 # Console PhoneBook Project
 
 ## Introduction
@@ -10,7 +9,7 @@ Developed using **C# (.NET 9)** and **SQL Server**.
 
 * Please read the Setup instructions lower in the file before start.
 
-* https://www.thecsharpacademy.com/project/16/phonebook
+* <https://www.thecsharpacademy.com/project/16/phonebook>
 
 ## Given Requirements
 
@@ -90,6 +89,7 @@ constant in `UserInterface.cs`.
 ### Managing Contacts
 
 Users can:
+
 * Add, edit, delete, or view contacts.
 * Assign one or more phone numbers per contact (each with optional “default”
 status).
@@ -123,7 +123,7 @@ Mac for coding.
 
 ### 3. Gmail API Setup
 
-1. Go to https://console.cloud.google.com/
+1. Go to <https://console.cloud.google.com/>
 2. Create a new Google Cloud Project.
 3. Enable the Gmail API.
 4. Create OAuth 2.0 credentials → Download `credentials.json`.
