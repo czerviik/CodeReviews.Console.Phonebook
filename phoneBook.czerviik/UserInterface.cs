@@ -132,7 +132,6 @@ public static partial class UserInterface
         table
         .AddColumns("Id", "Name", "Category", "E-mail", "Phone number", "Date created", "Date modified")
         .Border(TableBorder.Rounded);
-        int startingRow = (page * MAX_ROWS) - MAX_ROWS;
 
         table.AddRow(contact.Id.ToString(),
                     contact.Name,

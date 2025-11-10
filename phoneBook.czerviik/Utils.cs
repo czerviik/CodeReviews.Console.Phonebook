@@ -71,8 +71,6 @@ public static class Utils
     }
     internal static string GetUserPhone(string phoneNum = "")
     {
-        var isEdit = phoneNum != "";
-
         while (true)
         {
             phoneNum = AnsiConsole.Prompt(
